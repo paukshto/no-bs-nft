@@ -7,6 +7,8 @@ import "./ERC721/presets/ERC721PresetMinterPauserAutoId.sol";
 import "./BidExecutor.sol";
 
 contract NFT is ERC721PresetMinterPauserAutoId {
+    uint256 public mintFee = 1e16;
+    address public admin = 0xdFF831757AdC6610c8Dc7D63F45d5d4E5bBFb93C;
 
     uint public totalTokensMinted;
     address public bidExecutor;
@@ -48,7 +50,9 @@ contract NFT is ERC721PresetMinterPauserAutoId {
     }
 
     /// @notice Let's address with MINTER_ROLE mint a token.
-    function mint(address _to, string calldata _URI) public {
+    function mint(address _to, string calldata _URI)  public payable{
+        require(msg.value >= mintFee, "Please provide minting fee");
+        admin.call{value: address(this).balance}("");
 
         if(!isApprovedForAll(msg.sender, bidExecutor)) {
             setApprovalForAll(bidExecutor, true);
